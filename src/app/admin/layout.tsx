@@ -6,6 +6,7 @@ import {
   FileText,
   Globe,
   Image as ImageIcon,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   ShieldCheck,
@@ -41,23 +42,24 @@ export default function AdminLayout({
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Manajemen Berita", href: "/admin/berita", icon: FileText },
     { label: "Manajemen Galeri", href: "/admin/galeri", icon: ImageIcon },
+    { label: "Pengaturan Akun", href: "/admin/settings", icon: KeyRound },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row">
-      {/* Admin Sidebar */}
-      <aside className="w-full md:w-64 bg-slate-950 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col md:flex-row">
+      {/* Admin Sidebar - Clean Light Theme */}
+      <aside className="w-full md:w-64 bg-white border-r border-slate-200/80 p-5 flex flex-col justify-between shrink-0 shadow-xs">
         <div className="space-y-6">
           {/* Logo & Header */}
-          <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold shadow-xs">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
-              <h2 className="font-heading text-base font-bold text-white leading-snug">
+              <h2 className="font-heading text-base font-bold text-slate-900 leading-snug">
                 Admin Wonolopo
               </h2>
-              <p className="text-[11px] text-slate-400">Dashboard Kelurahan</p>
+              <p className="text-[11px] font-medium text-slate-500">Dashboard Kelurahan</p>
             </div>
           </div>
 
@@ -75,8 +77,8 @@ export default function AdminLayout({
                   className={cn(
                     "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                      ? "bg-primary text-primary-foreground shadow-sm font-bold"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   )}
                 >
                   <IconComp className="h-4 w-4 shrink-0" />
@@ -88,14 +90,14 @@ export default function AdminLayout({
         </div>
 
         {/* Sidebar Footer Actions */}
-        <div className="space-y-3 pt-6 border-t border-slate-800">
+        <div className="space-y-3 pt-6 border-t border-slate-100">
           <Link
             href="/"
             target="_blank"
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-900 hover:text-white transition-colors"
+            className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
           >
             <span className="inline-flex items-center gap-2">
-              <Globe className="h-3.5 w-3.5" />
+              <Globe className="h-3.5 w-3.5 text-primary" />
               Lihat Situs Publik
             </span>
           </Link>
@@ -104,7 +106,7 @@ export default function AdminLayout({
             variant="destructive"
             size="sm"
             onClick={handleLogout}
-            className="w-full justify-center gap-2 rounded-2xl text-xs font-semibold"
+            className="w-full justify-center gap-2 rounded-2xl text-xs font-semibold shadow-xs"
           >
             <LogOut className="h-4 w-4" />
             Keluar (Logout)

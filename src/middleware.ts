@@ -4,8 +4,31 @@ import { ADMIN_COOKIE_NAME, verifyAdminToken } from "@/lib/auth";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Protect /admin routes (except /admin/login)
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+  // 1. Always bypass API routes
+  if (pathname.startsWith("/api")) {
+    return NextResponse.next();
+  }
+
+  // 2. Handle /admin root redirect
+  if (pathname === "/admin") {
+    const adminToken = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+    if (adminToken && (await verifyAdminToken(adminToken))) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    return NextResponse.redirect(new URL("/admin/login", request.url));
+  }
+
+  // 3. Handle /admin/login page: if already authenticated, redirect to /admin/dashboard
+  if (pathname === "/admin/login") {
+    const adminToken = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+    if (adminToken && (await verifyAdminToken(adminToken))) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // 4. Protect all other /admin/* pages (e.g. /admin/dashboard, /admin/berita, /admin/galeri)
+  if (pathname.startsWith("/admin/")) {
     const adminToken = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
 
     if (!adminToken) {
@@ -24,14 +47,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect /admin to /admin/dashboard
-  if (pathname === "/admin") {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/admin"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

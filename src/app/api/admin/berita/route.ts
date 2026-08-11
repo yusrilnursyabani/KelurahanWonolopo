@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase/client";
 import { addInMemoryBerita, getInMemoryBerita, type BeritaItem } from "@/lib/mock-store";
 
@@ -7,13 +8,13 @@ export async function GET() {
     const { data, error } = await supabase
       .from("berita")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("event_date", { ascending: false });
 
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       return NextResponse.json({ success: true, data });
     }
   } catch {
-    // Fallback to inMemoryBerita
+    // Fallback
   }
 
   return NextResponse.json({ success: true, data: getInMemoryBerita() });
@@ -39,34 +40,38 @@ export async function POST(request: Request) {
       "-" +
       Math.random().toString(36).substring(2, 6);
 
-    const newItem: BeritaItem = {
-      id: "b-" + Date.now(),
-      title,
+    const payload = {
+      title: title.trim(),
       slug,
       cover_image_url: cover_image_url || "/Asset/Image/Berita1.png",
       content_image_url: content_image_url || cover_image_url || "/Asset/Image/Berita1.png",
-      content,
+      content: content.trim(),
       category: category || "Giat Kelurahan",
       event_date: event_date || new Date().toISOString().split("T")[0],
-      created_at: new Date().toISOString(),
     };
 
-    try {
-      const { data, error } = await supabase
-        .from("berita")
-        .insert([newItem])
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from("berita")
+      .insert([payload])
+      .select()
+      .single();
 
-      if (!error && data) {
-        addInMemoryBerita(data);
-        return NextResponse.json({ success: true, data, message: "Berita berhasil ditambahkan!" });
-      }
-    } catch {
-      // Supabase insert fallback
+    if (!error && data) {
+      addInMemoryBerita(data);
+      revalidatePath("/berita");
+      revalidatePath("/admin/berita");
+      return NextResponse.json({ success: true, data, message: "Berita berhasil dipublikasikan ke Supabase!" });
     }
 
+    // Fallback
+    const newItem: BeritaItem = {
+      id: "b-" + Date.now(),
+      ...payload,
+      created_at: new Date().toISOString(),
+    };
     addInMemoryBerita(newItem);
+    revalidatePath("/berita");
+    revalidatePath("/admin/berita");
     return NextResponse.json({ success: true, data: newItem, message: "Berita berhasil ditambahkan!" });
   } catch (err) {
     return NextResponse.json(

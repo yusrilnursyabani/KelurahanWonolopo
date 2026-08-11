@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase/client";
 import { addInMemoryGaleri, getInMemoryGaleri, type GaleriItem } from "@/lib/mock-store";
 
@@ -9,11 +10,11 @@ export async function GET() {
       .select("*")
       .order("event_date", { ascending: false });
 
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       return NextResponse.json({ success: true, data });
     }
   } catch {
-    // Fallback to memory
+    // Fallback
   }
 
   return NextResponse.json({ success: true, data: getInMemoryGaleri() });
@@ -31,31 +32,34 @@ export async function POST(request: Request) {
       );
     }
 
-    const newItem: GaleriItem = {
-      id: "g-" + Date.now(),
+    const payload = {
       title: title || "Dokumentasi Kegiatan Wonolopo",
       image_url,
       category: category || "Kegiatan Kelurahan",
       event_date: event_date || new Date().toISOString().split("T")[0],
-      created_at: new Date().toISOString(),
     };
 
-    try {
-      const { data, error } = await supabase
-        .from("galeri")
-        .insert([newItem])
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from("galeri")
+      .insert([payload])
+      .select()
+      .single();
 
-      if (!error && data) {
-        addInMemoryGaleri(data);
-        return NextResponse.json({ success: true, data, message: "Foto galeri berhasil ditambahkan!" });
-      }
-    } catch {
-      // Supabase insert fallback
+    if (!error && data) {
+      addInMemoryGaleri(data);
+      revalidatePath("/galeri");
+      revalidatePath("/admin/galeri");
+      return NextResponse.json({ success: true, data, message: "Foto galeri berhasil ditambahkan ke Supabase!" });
     }
 
+    const newItem: GaleriItem = {
+      id: "g-" + Date.now(),
+      ...payload,
+      created_at: new Date().toISOString(),
+    };
     addInMemoryGaleri(newItem);
+    revalidatePath("/galeri");
+    revalidatePath("/admin/galeri");
     return NextResponse.json({ success: true, data: newItem, message: "Foto galeri berhasil ditambahkan!" });
   } catch (err) {
     return NextResponse.json(

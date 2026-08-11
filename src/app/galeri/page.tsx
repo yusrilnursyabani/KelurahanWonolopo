@@ -1,27 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   ArrowDownUp,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   Download,
   Eye,
-  Filter,
+  FileQuestion,
   Image as ImageIcon,
+  RefreshCw,
   Sparkles,
   X,
 } from "lucide-react";
 
 import type { GaleriItem } from "@/lib/mock-store";
 import { Container, Section } from "@/components/common";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export default function PublicGaleriPage() {
   const [galeriList, setGaleriList] = useState<GaleriItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [sortOrder, setSortOrder] = useState<"latest" | "oldest">("latest");
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const limit = 6;
 
   // Lightbox Modal State
   const [activePhoto, setActivePhoto] = useState<GaleriItem | null>(null);
@@ -35,23 +45,43 @@ export default function PublicGaleriPage() {
     "Keagamaan",
   ];
 
-  useEffect(() => {
-    async function loadGaleri() {
-      setIsLoading(true);
-      try {
-        const res = await fetch(`/api/galeri?category=${selectedCategory}&sort=${sortOrder}`);
-        const json = await res.json();
-        if (json.success && json.data) {
-          setGaleriList(json.data);
-        }
-      } catch {
-        // Fallback
-      } finally {
-        setIsLoading(false);
+  const loadGaleri = async () => {
+    setIsLoading(true);
+    setHasError(false);
+    try {
+      const url = `/api/galeri?category=${encodeURIComponent(
+        selectedCategory
+      )}&sort=${sortOrder}&page=${page}&limit=${limit}`;
+
+      const res = await fetch(url);
+      const json = await res.json();
+      if (json.success) {
+        setGaleriList(json.data || []);
+        setTotalPages(json.totalPages || 1);
+        setTotalCount(json.total || 0);
+      } else {
+        setHasError(true);
       }
+    } catch {
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadGaleri();
-  }, [selectedCategory, sortOrder]);
+  }, [selectedCategory, sortOrder, page]);
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    setPage(1);
+  };
+
+  const handleSortChange = (val: "latest" | "oldest") => {
+    setSortOrder(val);
+    setPage(1);
+  };
 
   const formatIndonesianDate = (dateStr: string) => {
     try {
@@ -92,7 +122,7 @@ export default function PublicGaleriPage() {
               return (
                 <button
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => handleCategoryChange(cat)}
                   className={`inline-flex shrink-0 items-center gap-2 rounded-2xl px-4 py-2 text-xs font-semibold transition-all duration-200 ${
                     isSelected
                       ? "bg-primary text-primary-foreground shadow-xs"
@@ -112,7 +142,7 @@ export default function PublicGaleriPage() {
             </span>
             <select
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value as "latest" | "oldest")}
+              onChange={(e) => handleSortChange(e.target.value as "latest" | "oldest")}
               className="h-9 rounded-2xl border border-border bg-background px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="latest">Terbaru Pertama</option>
@@ -121,10 +151,34 @@ export default function PublicGaleriPage() {
           </div>
         </div>
 
-        {/* Bento / Masonry Grid Display */}
+        {/* Content Section: Loading Skeleton / Error Boundary / Empty State / Grid */}
         {isLoading ? (
-          <div className="p-12 text-center text-muted-foreground">Memuat galeri foto...</div>
+          /* Skeleton Loader Grid */
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-80 rounded-3xl border border-border/60 bg-muted/40 p-4 space-y-4"
+              >
+                <div className="h-56 w-full rounded-2xl bg-muted/80" />
+                <div className="h-5 w-3/4 rounded-lg bg-muted/80" />
+                <div className="h-4 w-1/2 rounded-lg bg-muted/60" />
+              </div>
+            ))}
+          </div>
+        ) : hasError ? (
+          /* Error Fallback UI */
+          <div className="rounded-3xl border border-destructive/30 bg-destructive/5 p-12 text-center space-y-4">
+            <h3 className="font-heading text-lg font-bold text-destructive">Gagal Memuat Galeri Foto</h3>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+              Terjadi gangguan saat mengambil foto galeri dari server. Silakan coba muat ulang.
+            </p>
+            <Button onClick={loadGaleri} variant="outline" className="rounded-2xl gap-2 font-bold">
+              <RefreshCw className="h-4 w-4" /> Coba Lagi
+            </Button>
+          </div>
         ) : galeriList.length > 0 ? (
+          /* Bento / Masonry Grid Display with Next.js Image */
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {galeriList.map((item) => (
               <div
@@ -132,20 +186,23 @@ export default function PublicGaleriPage() {
                 onClick={() => setActivePhoto(item)}
                 className="group relative cursor-pointer overflow-hidden rounded-3xl border border-border/80 bg-card/90 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg"
               >
-                {/* Photo Image Preview */}
+                {/* Photo Image Preview via Next.js Image */}
                 <div className="relative h-64 w-full overflow-hidden bg-muted">
-                  <img
+                  <Image
                     src={item.image_url}
                     alt={item.title || "Dokumentasi Wonolopo"}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    loading="lazy"
+                    className="object-cover transition-transform duration-500 group-hover:scale-108"
                   />
                   {/* Category Badge */}
-                  <span className="absolute top-3.5 right-3.5 rounded-full bg-background/90 backdrop-blur-xs px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 border border-border/60 shadow-xs">
+                  <span className="absolute top-3.5 right-3.5 rounded-full bg-background/90 backdrop-blur-xs px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 border border-border/60 shadow-xs z-10">
                     {item.category}
                   </span>
 
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-slate-950/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-slate-950/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-center justify-center z-10">
                     <span className="inline-flex items-center gap-2 rounded-2xl bg-white/90 text-slate-900 px-4 py-2 text-xs font-bold shadow-md">
                       <Eye className="h-4 w-4" /> Lihat Ukuran Penuh
                     </span>
@@ -166,8 +223,62 @@ export default function PublicGaleriPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl border border-dashed p-12 text-center text-muted-foreground">
-            Tidak ada foto galeri pada kategori ini.
+          /* Empty State UI */
+          <div className="rounded-3xl border border-dashed border-border p-12 text-center space-y-3">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-3xl bg-muted text-muted-foreground">
+              <FileQuestion className="h-7 w-7" />
+            </div>
+            <h3 className="font-heading text-lg font-bold text-foreground">
+              Belum ada foto galeri yang diterbitkan
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              Tidak ada dokumentasi foto galeri yang sesuai dengan kategori &ldquo;{selectedCategory}&rdquo;.
+            </p>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="rounded-xl h-9 text-xs font-semibold gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" /> Sebelum
+            </Button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }).map((_, i) => {
+                const pageNum = i + 1;
+                const isActive = pageNum === page;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`h-9 w-9 rounded-xl text-xs font-bold transition-colors ${
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              className="rounded-xl h-9 text-xs font-semibold gap-1"
+            >
+              Sesudah <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         )}
 
@@ -178,14 +289,14 @@ export default function PublicGaleriPage() {
               {/* Close Button */}
               <button
                 onClick={() => setActivePhoto(null)}
-                className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:bg-rose-500 hover:text-white transition-colors"
+                className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:bg-rose-500 hover:text-white transition-colors z-20"
                 aria-label="Tutup Preview"
               >
                 <X className="h-5 w-5" />
               </button>
 
               {/* Full Resolution Image */}
-              <div className="overflow-hidden rounded-2xl bg-slate-950 border border-slate-800 flex justify-center">
+              <div className="relative overflow-hidden rounded-2xl bg-slate-950 border border-slate-800 flex justify-center min-h-[300px]">
                 <img
                   src={activePhoto.image_url}
                   alt={activePhoto.title || "Foto Galeri"}

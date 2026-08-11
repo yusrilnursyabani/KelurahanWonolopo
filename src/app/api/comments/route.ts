@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { addInMemoryComment, type CommentItem } from "@/lib/mock-store";
+import { sanitizeComment, sanitizeString } from "@/lib/sanitize";
 
 export async function POST(request: Request) {
   try {
@@ -14,12 +15,16 @@ export async function POST(request: Request) {
       );
     }
 
+    const cleanAuthorName = sanitizeString(author_name.trim());
+    const cleanAuthorEmail = sanitizeString(author_email.trim());
+    const cleanCommentText = sanitizeComment(comment_text.trim());
+
     const newComment: CommentItem = {
       id: "c-" + Date.now(),
       berita_id,
-      author_name: author_name.trim(),
-      author_email: author_email.trim(),
-      comment_text: comment_text.trim(),
+      author_name: cleanAuthorName,
+      author_email: cleanAuthorEmail,
+      comment_text: cleanCommentText,
       is_anonymous: Boolean(is_anonymous),
       created_at: new Date().toISOString(),
     };

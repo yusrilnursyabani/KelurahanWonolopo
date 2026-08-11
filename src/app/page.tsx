@@ -1,7 +1,6 @@
 import {
   AboutWonolopoSection,
   CtaSection,
-  EmpowermentProgramsSection,
   GallerySection,
   Hero,
   NewsSection,
@@ -15,7 +14,6 @@ export default function Home() {
       <QuickServicesSection />
       <AboutWonolopoSection />
       <NewsSection />
-      <EmpowermentProgramsSection />
       <GallerySection />
       <CtaSection />
     </>
