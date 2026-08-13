@@ -4,6 +4,10 @@ export const SITE_CONFIG = {
   city: "Kota Semarang",
   province: "Jawa Tengah",
   locale: "id-ID",
+  logo: {
+    shield: "/images/Kelurahan_wonolopo_logo.png",
+    full: "/images/Logo_Kelurahan_Wonolopo.png",
+  },
   contact: {
     email: "kel.wonolopo@gmail.com",
     phone: "(024) 766-72-723",

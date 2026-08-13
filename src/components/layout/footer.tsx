@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 
@@ -36,16 +37,26 @@ export function Footer() {
     <footer className="mt-auto border-t border-border/80 bg-card/95 text-card-foreground">
       <Container className="py-12 md:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr_1fr]">
-          {/* Section 1: Branding & Contact Info */}
+          {/* Section 1: Branding & Contact Info with Official Logo */}
           <div className="space-y-4">
-            <div className="space-y-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                Pemerintah Kota Semarang
-              </span>
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">
-                {SITE_CONFIG.name}
-              </h2>
+            <div className="flex items-center gap-3">
+              <Image
+                src={SITE_CONFIG.logo.shield}
+                alt="Logo Kelurahan Wonolopo"
+                width={48}
+                height={48}
+                className="h-12 w-auto object-contain shrink-0"
+              />
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
+                  Pemerintah Kota Semarang
+                </span>
+                <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
+                  {SITE_CONFIG.name}
+                </h2>
+              </div>
             </div>
+
             <p className="ds-body max-w-sm text-sm text-muted-foreground leading-relaxed">
               Portal resmi pelayanan publik, informasi kependudukan, dan komunikasi warga Kelurahan Wonolopo, {SITE_CONFIG.city}.
             </p>
@@ -131,9 +142,19 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright */}
-        <div className="mt-12 border-t border-border/60 pt-6 text-center text-xs text-muted-foreground">
+        {/* Bottom Bar: Copyright with Official Logo Badge */}
+        <div className="mt-12 border-t border-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>{SITE_CONFIG.copyright}</p>
+          <div className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+            <Image
+              src={SITE_CONFIG.logo.shield}
+              alt="Wonolopo Logo"
+              width={16}
+              height={16}
+              className="h-4 w-auto object-contain"
+            />
+            <span>Pemerintah Kelurahan Wonolopo, Semarang</span>
+          </div>
         </div>
       </Container>
     </footer>

@@ -1,8 +1,10 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { ChevronDownIcon } from "lucide-react"
 
+import { SITE_CONFIG } from "@/constants"
 import { mainNavigation } from "@/data"
 import { cn } from "@/lib/utils"
 
@@ -31,10 +33,32 @@ export function Navbar({ className, sticky = true, ...props }: NavbarProps) {
       {...props}
     >
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="font-heading text-lg font-semibold text-foreground">
-          Kelurahan Wonolopo
+        {/* Brand Logo & Name */}
+        <Link
+          href="/"
+          className="flex items-center gap-3 font-heading text-lg font-bold text-foreground transition-opacity hover:opacity-90 shrink-0"
+        >
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+            <Image
+              src={SITE_CONFIG.logo.shield}
+              alt="Logo Kelurahan Wonolopo"
+              width={40}
+              height={40}
+              priority
+              className="h-10 w-auto object-contain"
+            />
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-base font-bold tracking-tight text-foreground">
+              {SITE_CONFIG.name}
+            </span>
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              {SITE_CONFIG.city}
+            </span>
+          </div>
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigasi utama">
           {mainNavigation.map((item) => {
             if (item.children?.length) {
@@ -46,7 +70,7 @@ export function Navbar({ className, sticky = true, ...props }: NavbarProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="min-w-52">
                     <DropdownMenuItem>
-                      <Link href={item.href} className="w-full">
+                      <Link href={item.href} className="w-full font-semibold text-primary">
                         Lihat semua {item.label}
                       </Link>
                     </DropdownMenuItem>
@@ -70,6 +94,7 @@ export function Navbar({ className, sticky = true, ...props }: NavbarProps) {
           })}
         </nav>
 
+        {/* Mobile Navigation */}
         <MobileNav items={mainNavigation} />
       </Container>
     </header>

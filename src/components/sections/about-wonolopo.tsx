@@ -72,9 +72,9 @@ export function AboutWonolopoSection() {
             {/* COMPACT INTERACTIVE MISI LIST */}
             <div className="space-y-3 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <h4 className="font-heading text-lg font-bold text-foreground">
+                <h3 className="font-heading text-lg font-bold text-foreground">
                   Misi Pembangunan Kelurahan
-                </h4>
+                </h3>
                 <span className="text-xs text-muted-foreground">
                   5 Poin Kunci Misi
                 </span>
@@ -102,9 +102,9 @@ export function AboutWonolopoSection() {
                             <span className="text-[11px] font-semibold text-primary block">
                               {misi.tag}
                             </span>
-                            <h5 className="font-heading text-sm font-bold text-foreground">
+                            <h4 className="font-heading text-sm font-bold text-foreground">
                               {misi.title}
-                            </h5>
+                            </h4>
                           </div>
                         </div>
                         <ChevronDownIcon

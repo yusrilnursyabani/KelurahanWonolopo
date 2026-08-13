@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { SITE_CONFIG } from "@/constants";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -47,13 +49,23 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col md:flex-row">
-      {/* Admin Sidebar - Clean Light Theme */}
+      {/* Admin Sidebar - Clean Light Theme with Official Logo */}
       <aside className="w-full md:w-64 bg-white border-r border-slate-200/80 p-5 flex flex-col justify-between shrink-0 shadow-xs">
         <div className="space-y-6">
-          {/* Logo & Header */}
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold shadow-xs">
-              <ShieldCheck className="h-6 w-6" />
+          {/* Logo & Header Link to /admin/dashboard */}
+          <Link
+            href="/admin/dashboard"
+            className="flex items-center gap-3 border-b border-slate-100 pb-4 transition-opacity hover:opacity-90"
+          >
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-50 p-1 border border-slate-200/80 shadow-xs">
+              <Image
+                src={SITE_CONFIG.logo.shield}
+                alt="Logo Kelurahan Wonolopo"
+                width={36}
+                height={36}
+                priority
+                className="h-8 w-auto object-contain"
+              />
             </div>
             <div>
               <h2 className="font-heading text-base font-bold text-slate-900 leading-snug">
@@ -61,7 +73,7 @@ export default function AdminLayout({
               </h2>
               <p className="text-[11px] font-medium text-slate-500">Dashboard Kelurahan</p>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation Items */}
           <nav className="space-y-1.5">
@@ -89,7 +101,7 @@ export default function AdminLayout({
           </nav>
         </div>
 
-        {/* Sidebar Footer Actions */}
+        {/* Sidebar Footer Actions & Logo Copyright Badge */}
         <div className="space-y-3 pt-6 border-t border-slate-100">
           <Link
             href="/"
@@ -111,6 +123,17 @@ export default function AdminLayout({
             <LogOut className="h-4 w-4" />
             Keluar (Logout)
           </Button>
+
+          <div className="pt-2 text-center text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
+            <Image
+              src={SITE_CONFIG.logo.shield}
+              alt="Wonolopo Shield"
+              width={14}
+              height={14}
+              className="h-3.5 w-auto object-contain opacity-70"
+            />
+            <span>© 2026 Kelurahan Wonolopo</span>
+          </div>
         </div>
       </aside>
 

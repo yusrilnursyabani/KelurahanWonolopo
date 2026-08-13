@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AlertCircleIcon, ArrowLeftIcon, Clock3Icon, LandmarkIcon, MapPinIcon } from "lucide-react";
@@ -6,7 +7,17 @@ import { getServiceDetailBySlug, serviceCatalog, serviceCategories } from "@/dat
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScientificArticlesView } from "./scientific-articles-view";
+
+const ScientificArticlesView = dynamic(
+  () => import("./scientific-articles-view").then((mod) => mod.ScientificArticlesView),
+  {
+    loading: () => (
+      <div className="rounded-3xl border border-border/80 bg-card p-12 text-center text-sm font-medium text-muted-foreground animate-pulse">
+        Memuat viewer artikel ilmiah...
+      </div>
+    ),
+  }
+);
 
 interface ServiceDetailContentProps {
   slug: string;

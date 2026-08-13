@@ -94,9 +94,9 @@ export function VisionMissionView() {
               <TargetIcon className="size-4" />
               Misi Strategis
             </div>
-            <h3 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
+            <h2 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
               5 Misi Utama Pembangunan
-            </h3>
+            </h2>
           </div>
 
           {/* View Mode Toggle Switcher */}
@@ -152,9 +152,9 @@ export function VisionMissionView() {
                           {mission.tag}
                         </Badge>
                       </div>
-                      <h4 className="font-heading text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="font-heading text-lg font-bold text-foreground group-hover:text-primary transition-colors">
                         {mission.title}
-                      </h4>
+                      </h3>
                       <p className="text-sm leading-relaxed text-muted-foreground">
                         {mission.description}
                       </p>

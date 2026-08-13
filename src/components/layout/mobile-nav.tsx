@@ -1,8 +1,10 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { MenuIcon } from "lucide-react"
 
+import { SITE_CONFIG } from "@/constants"
 import type { NavigationItem } from "@/types/content"
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -21,11 +23,24 @@ export function MobileNav({ items }: MobileNavProps) {
         <MenuIcon className="icon-md" />
       </SheetTrigger>
       <SheetContent side="right" className="w-[86vw] max-w-sm p-0">
-        <SheetHeader className="border-b border-border">
-          <SheetTitle>Menu Navigasi</SheetTitle>
-          <SheetDescription>
-            Akses cepat ke halaman utama portal Kelurahan Wonolopo.
-          </SheetDescription>
+        <SheetHeader className="border-b border-border p-4 text-left">
+          <div className="flex items-center gap-3">
+            <Image
+              src={SITE_CONFIG.logo.shield}
+              alt="Logo Kelurahan Wonolopo"
+              width={36}
+              height={36}
+              className="h-9 w-auto object-contain"
+            />
+            <div>
+              <SheetTitle className="text-base font-bold leading-tight">
+                {SITE_CONFIG.name}
+              </SheetTitle>
+              <SheetDescription className="text-xs text-muted-foreground">
+                Portal Resmi {SITE_CONFIG.city}
+              </SheetDescription>
+            </div>
+          </div>
         </SheetHeader>
 
         <nav className="grid gap-1 p-4" aria-label="Navigasi mobile">

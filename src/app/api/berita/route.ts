@@ -6,11 +6,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
   const query = searchParams.get("q");
-  const pageParam = parseInt(searchParams.get("page") || "1", 10);
-  const limitParam = parseInt(searchParams.get("limit") || "6", 10);
+  
+  const rawPage = parseInt(searchParams.get("page") || "1", 10);
+  const rawLimit = parseInt(searchParams.get("limit") || "6", 10);
 
-  const page = Math.max(1, isNaN(pageParam) ? 1 : pageParam);
-  const limit = Math.max(1, isNaN(limitParam) ? 6 : limitParam);
+  const page = Math.max(1, isNaN(rawPage) ? 1 : rawPage);
+  const limit = Math.max(1, isNaN(rawLimit) ? 6 : rawLimit);
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
@@ -32,7 +33,9 @@ export async function GET(request: Request) {
 
     const { data, count, error } = await queryBuilder;
 
-    if (!error && data) {
+    if (error) {
+      console.error("Supabase GET /api/berita Error:", error.message || error);
+    } else if (data && data.length > 0) {
       const total = count ?? data.length;
       const totalPages = Math.ceil(total / limit) || 1;
 
@@ -45,10 +48,11 @@ export async function GET(request: Request) {
         totalPages,
       });
     }
-  } catch {
-    // Fallback to memory
+  } catch (err) {
+    console.error("GET /api/berita Exception:", err);
   }
 
+  // Failsafe Fallback to Memory Store
   let list = getInMemoryBerita();
   if (category && category !== "Semua") {
     list = list.filter((item) => item.category.toLowerCase() === category.toLowerCase());

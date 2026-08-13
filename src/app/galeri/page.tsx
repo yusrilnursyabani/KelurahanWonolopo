@@ -12,7 +12,6 @@ import {
   FileQuestion,
   Image as ImageIcon,
   RefreshCw,
-  Sparkles,
   X,
 } from "lucide-react";
 
@@ -53,16 +52,20 @@ export default function PublicGaleriPage() {
         selectedCategory
       )}&sort=${sortOrder}&page=${page}&limit=${limit}`;
 
-      const res = await fetch(url);
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
       const json = await res.json();
-      if (json.success) {
-        setGaleriList(json.data || []);
+      if (json.success && Array.isArray(json.data)) {
+        setGaleriList(json.data);
         setTotalPages(json.totalPages || 1);
         setTotalCount(json.total || 0);
       } else {
         setHasError(true);
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to load galeri:", err);
       setHasError(true);
     } finally {
       setIsLoading(false);

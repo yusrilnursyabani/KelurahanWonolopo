@@ -1,9 +1,11 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { KeyRound, Lock, ShieldAlert, ShieldCheck, User } from "lucide-react";
+import { KeyRound, Lock, ShieldAlert, User } from "lucide-react";
 
+import { SITE_CONFIG } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -67,14 +69,21 @@ function AdminLoginForm() {
       <div className="h-2 bg-gradient-to-r from-red-600 via-emerald-600 to-amber-500" />
 
       <CardHeader className="space-y-3 text-center pb-2 pt-6">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20 shadow-xs">
-          <ShieldCheck className="h-8 w-8" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 dark:bg-slate-800 border border-border/80 shadow-xs p-2">
+          <Image
+            src={SITE_CONFIG.logo.shield}
+            alt="Logo Kelurahan Wonolopo"
+            width={48}
+            height={48}
+            priority
+            className="h-12 w-auto object-contain"
+          />
         </div>
         <CardTitle className="font-heading text-2xl font-bold tracking-tight text-foreground">
           Portal Login Admin
         </CardTitle>
         <CardDescription className="text-muted-foreground text-sm leading-relaxed px-4">
-          Masukkan username dan password autentikasi untuk mengelola sistem Kelurahan Wonolopo.
+          Masukkan username dan password otentikasi untuk mengelola sistem Kelurahan Wonolopo.
         </CardDescription>
       </CardHeader>
 
