@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   Activity,
@@ -90,12 +91,12 @@ export function ServiceCard({ service, className }: ServiceCardProps) {
   const isExternal = service.isExternal;
   const href = isExternal ? service.url || "#" : `/layanan/${service.slug}`;
 
-  const content = (
+  return (
     <Card
       className={cn(
         "group relative flex h-full flex-col justify-between overflow-hidden transition-all duration-300",
         "border border-border/80 bg-card/90 backdrop-blur-xs",
-        "hover:-translate-y-1.5 hover:shadow-md md:hover:shadow-lg",
+        "hover:-translate-y-1 hover:shadow-md md:hover:shadow-lg",
         colorScheme.border,
         isExternal && "border-dashed sm:border-solid hover:bg-slate-50/60 dark:hover:bg-slate-900/40",
         className
@@ -115,11 +116,21 @@ export function ServiceCard({ service, className }: ServiceCardProps) {
             {/* Soft Pastel Icon Container */}
             <div
               className={cn(
-                "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110",
+                "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-105 overflow-hidden",
                 colorScheme.iconBg
               )}
             >
-              <IconComponent className="h-6 w-6" />
+              {service.imageIcon ? (
+                <Image
+                  src={service.imageIcon}
+                  alt={service.title}
+                  width={40}
+                  height={40}
+                  className="h-9 w-9 object-contain"
+                />
+              ) : (
+                <IconComponent className="h-6 w-6" />
+              )}
             </div>
 
             {/* Badges */}
@@ -147,7 +158,20 @@ export function ServiceCard({ service, className }: ServiceCardProps) {
           </div>
 
           <h3 className="font-heading text-lg font-bold leading-snug text-foreground transition-colors group-hover:text-primary md:text-xl">
-            {service.title}
+            {isExternal ? (
+              <a
+                href={service.url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline focus-visible:outline-hidden"
+              >
+                {service.title}
+              </a>
+            ) : (
+              <Link href={`/layanan/${service.slug}`} className="hover:underline focus-visible:outline-hidden">
+                {service.title}
+              </Link>
+            )}
           </h3>
         </CardHeader>
 
@@ -158,52 +182,44 @@ export function ServiceCard({ service, className }: ServiceCardProps) {
         </CardContent>
       </div>
 
-      {/* Card Footer CTA */}
-      <div className="border-t border-border/50 bg-muted/20 px-6 py-3.5 transition-colors group-hover:bg-muted/40">
-        <div className="flex items-center justify-between text-xs font-semibold">
-          <span
-            className={cn(
-              "inline-flex items-center gap-1.5 transition-colors",
-              isExternal ? "text-amber-700 dark:text-amber-400 group-hover:text-amber-600" : "text-primary group-hover:text-primary/90"
-            )}
+      {/* Card Footer CTAs */}
+      <div className="border-t border-border/50 bg-muted/20 px-5 py-3.5 transition-colors group-hover:bg-muted/40">
+        {isExternal ? (
+          <a
+            href={service.url || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between text-xs font-semibold text-amber-700 hover:text-amber-600 dark:text-amber-400"
           >
-            {isExternal ? "Buka Portal Resmi" : "Lihat Detail Layanan"}
-          </span>
+            <span className="inline-flex items-center gap-1.5">Buka Portal Resmi</span>
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-white shadow-2xs transition-transform group-hover:scale-105">
+              <ExternalLink className="h-3.5 w-3.5" />
+            </span>
+          </a>
+        ) : (
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <Link
+              href={`/layanan/${service.slug}`}
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border/80 bg-background/90 px-3.5 py-2 text-xs font-semibold text-foreground shadow-2xs transition-all hover:bg-muted hover:text-primary hover:border-primary/40 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span>Lihat Detail Persyaratan</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
 
-          <span
-            className={cn(
-              "flex h-7 w-7 items-center justify-center rounded-full bg-background/80 shadow-2xs transition-all duration-300",
-              isExternal
-                ? "text-amber-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:bg-amber-500 group-hover:text-white"
-                : "text-primary group-hover:translate-x-1 group-hover:bg-primary group-hover:text-primary-foreground"
+            {service.onlineUrl && (
+              <a
+                href={service.onlineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition-all hover:bg-primary/90 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>Ajukan Online via Apel Surga</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             )}
-          >
-            {isExternal ? <ExternalLink className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
-          </span>
-        </div>
+          </div>
+        )}
       </div>
     </Card>
-  );
-
-  if (isExternal) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block h-full focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-2xl"
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return (
-    <Link
-      href={href}
-      className="block h-full focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-2xl"
-    >
-      {content}
-    </Link>
   );
 }

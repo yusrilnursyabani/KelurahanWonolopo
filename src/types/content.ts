@@ -23,10 +23,12 @@ export interface ServiceItem {
   title: string;
   slug?: string;
   url?: string;
+  onlineUrl?: string;
   description: string;
   category: Exclude<ServiceCategoryKey, "all">;
   isExternal?: boolean;
   iconName?: string;
+  imageIcon?: string;
   badgeText?: string;
 }
 
@@ -35,21 +37,40 @@ export interface ServiceRequirement {
   label: string;
 }
 
+export interface RequirementSection {
+  id: string;
+  title: string;
+  description?: string;
+  items: string[];
+  notes?: string[];
+  downloadUrl?: string;
+  downloadLabel?: string;
+}
+
 export interface ServiceStep {
   step: number;
   title: string;
   description: string;
 }
 
+export interface ServiceDownloadItem {
+  label: string;
+  url: string;
+  description?: string;
+}
+
 export interface ServiceDetail {
   slug: ServiceItem["slug"];
   summary: string;
-  requirements: ServiceRequirement[];
+  onlineUrl?: string;
+  requirements?: ServiceRequirement[];
+  requirementSections?: RequirementSection[];
   steps: ServiceStep[];
   duration: string;
   cost: string;
   location: string;
   notes?: string[];
+  downloads?: ServiceDownloadItem[];
 }
 
 export interface NewsItem {
